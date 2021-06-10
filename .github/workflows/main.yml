@@ -1,10 +1,10 @@
-name: 'Keep Workflow Alive'
+name: 'XXOO'
 
 on:
   workflow_dispatch:
     inputs:
   schedule:
-    - cron: '* */2 * * 1-5'
+    - cron: '* */5 * * 1-5'
 
 jobs:
   keep_alive:
