@@ -1,0 +1,39 @@
+name: 'Keep Workflow Alive'
+
+on:
+  workflow_dispatch:
+    inputs:
+  schedule:
+    - cron: '* */5 * * 1-5'
+
+jobs:
+  keep_alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout codes'
+        uses: actions/checkout@v2
+      
+      - name: 'Create UUID'
+        run: echo $(cat /proc/sys/kernel/random/uuid) > UUID
+      
+      - name: 'CF'
+        id: commit
+        run: |
+          git config --global user.name "${{ secrets.GIT_NAME }}"
+          git config --global user.email "${{ secrets.GIT_EMAIL }}"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -am 'Keep Workflow Alive'
+          echo ::set-output name=status::success
+           
+      - name: 'GitHub Push'
+        if: steps.commit.output.status != 'success'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          
+      - name: Delete Workflow Runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          retain_days: 1
+          keep_minimum_runs: 1
