@@ -25,7 +25,7 @@ jobs:
           git diff --quiet && git diff --staged --quiet || git commit -am 'UPDATE'
           echo ::set-output name=status::success
            
-      - name: 'GitHub Push'
+      - name: 'TS'
         if: steps.commit.output.status != 'success'
         uses: ad-m/github-push-action@master
         with:
